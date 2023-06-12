@@ -3,6 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 
+import Controllers.Update;
+import Model.DataBarang;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+
+import static Controllers.Create.insertData;
+import static Controllers.Delete.deleteData;
+import static Controllers.Read.getDatabase;
+import static Controllers.Update.updateData;
+
 /**
  *
  * @author ASUS
@@ -34,7 +48,7 @@ public class app extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabelProduk = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -109,7 +123,7 @@ public class app extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Nunito Medium", 1, 18)); // NOI18N
         jLabel5.setText("TABEL PRODUK");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabelProduk.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -120,7 +134,7 @@ public class app extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        jScrollPane2.setViewportView(tabelProduk);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -239,7 +253,12 @@ public class app extends javax.swing.JFrame {
         TambahBTN.setText("Tambah");
         TambahBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TambahBTNActionPerformed(evt);
+                try {
+                    TambahBTNActionPerformed(evt);
+                } catch (SQLException e){
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -340,11 +359,63 @@ public class app extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void EditBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditBTNActionPerformed
-        // TODO add your handling code 
+        DefaultTableModel model = (DefaultTableModel) tabelProduk.getModel();
+        int rowSelected = tabelProduk.getSelectedRow();
+
+        if (rowSelected >= 0) {
+            if (EditBTN.getText() == "Edit") {
+                TambahBTN.setEnabled(false);
+                DeleteBTN.setEnabled(false);
+                EditBTN.setText("Update");
+                HitungBTN.setEnabled(false);
+                SimpanBTN.setEnabled(false);
+                namaTF.setText(model.getValueAt(rowSelected, 1).toString());
+                HargaTF.setText(model.getValueAt(rowSelected, 2).toString());
+                JumlahTF.setText(model.getValueAt(rowSelected, 3).toString());
+            } else {
+                try {
+                    TambahBTN.setEnabled(true);
+                    DeleteBTN.setEnabled(true);
+                    EditBTN.setText("Edit");
+                    HitungBTN.setEnabled(true);
+                    SimpanBTN.setEnabled(true);
+                    String nama = namaTF.getText();
+                    int harga = Integer.parseInt(HargaTF.getText());
+                    int jumlah = Integer.parseInt(JumlahTF.getText());
+                    updateData(nama,harga,jumlah);
+                    clearBarang();
+                } catch (Exception exception){
+                    JOptionPane.showMessageDialog(this, "Input Tidak Valid!", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Tidak ada baris yang dipilih.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_EditBTNActionPerformed
 
     private void DeleteBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteBTNActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) tabelProduk.getModel();
+        int rowSelected = tabelProduk.getSelectedRow();
+
+        if (rowSelected >= 0) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Anda yakin ingin menghapus baris ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                model.removeRow(rowSelected);
+                tabelProduk.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        try {
+                            String nama = tabelProduk.getValueAt(rowSelected, 1).toString();
+                            deleteData(nama);
+                        } catch (SQLException sqlException){
+                            sqlException.printStackTrace();
+                        }
+                    }
+                });
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Tidak ada baris yang dipilih.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_DeleteBTNActionPerformed
 
     private void SimpanBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SimpanBTNActionPerformed
@@ -363,22 +434,59 @@ public class app extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_KembaliTFActionPerformed
 
-    private void TambahBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TambahBTNActionPerformed
+    private void TambahBTNActionPerformed(java.awt.event.ActionEvent evt) throws SQLException{//GEN-FIRST:event_TambahBTNActionPerformed
         boolean kondisi1 = !namaTF.getText().isBlank() && !HargaTF.getText().isBlank() && !JumlahTF.getText().isBlank();
-        if (kondisi1){
-            
-        } else {
-            
+        try {
+            if (kondisi1){
+                String nama = namaTF.getText();
+                int harga = Integer.parseInt(HargaTF.getText());
+                int jumlah = Integer.parseInt(JumlahTF.getText());
+                insertBarang(nama,harga,jumlah);
+                clearBarang();
+            } else {
+                JOptionPane.showMessageDialog(this, "Pastikan Semua Data Terisi!", "Warning", JOptionPane.WARNING_MESSAGE);
+                clearBarang();
+            }
+        } catch (Exception e){
+            clearBarang();
+            JOptionPane.showMessageDialog(this, "Input Tidak Valid!", "Warning", JOptionPane.WARNING_MESSAGE);
+
         }
+
     }//GEN-LAST:event_TambahBTNActionPerformed
 
     private void ClearBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClearBTNActionPerformed
-
+        clearBarang();
     }//GEN-LAST:event_ClearBTNActionPerformed
 
     private void HitungBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HitungBTNActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_HitungBTNActionPerformed
+
+    private void clearBarang(){
+        namaTF.setText("");
+        HargaTF.setText("");
+        JumlahTF.setText("");
+        namaTF.requestFocus();
+    }
+
+    private void insertBarang(String nama, int harga, int jumlah) throws SQLException {
+        insertData(nama,harga,jumlah);
+    }
+
+    private void showData() throws SQLException{
+        DefaultTableModel model = (DefaultTableModel) tabelProduk.getModel();
+        for (DataBarang dataBarang : getDatabase()){
+            String nama = dataBarang.getNamaProduk();
+            int harga = dataBarang.getHargaProduk();
+            int jumlah = dataBarang.getJumlahProduk();
+
+            Object[] data = {nama,harga,jumlah};
+            model.addRow(data);
+        }
+        model.fireTableDataChanged();
+
+    }
 
     /**
      * @param args the command line arguments
@@ -441,8 +549,8 @@ public class app extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jumlahbarangTF;
     private javax.swing.JTextField namaTF;
+    private javax.swing.JTable tabelProduk;
     // End of variables declaration//GEN-END:variables
 }
