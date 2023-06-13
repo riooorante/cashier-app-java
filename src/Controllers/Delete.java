@@ -20,7 +20,7 @@ public class Delete {
         DataBarang dataBarang = new DataBarang(nama);
         Connection conn = Connect.connection();
         try {
-            String querydel = "DELETE FROM main_data WHERE `nama_produk` = ?";
+            String querydel = "DELETE FROM tabel_produk WHERE `nama_produk` = ?";
             PreparedStatement statement = conn.prepareStatement(querydel);
             statement.setString(1, dataBarang.getNamaProduk());
             int rowsDeleted = statement.executeUpdate();

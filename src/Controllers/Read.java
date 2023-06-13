@@ -11,6 +11,7 @@ package Controllers;
 import Config.Connect;
 import Model.DataBarang;
 
+import java.security.spec.RSAOtherPrimeInfo;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class Read {
         Connection conn = Connect.connection();
         try {
             Statement statement = conn.createStatement();
-            ResultSet resultset = statement.executeQuery("SELECT * FROM main_data");
+            ResultSet resultset = statement.executeQuery("SELECT * FROM tabel_produk");
             if (resultset.next()) {
                 while (resultset.next()) {
                     String nama = resultset.getString("nama_produk");
