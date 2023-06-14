@@ -59,6 +59,12 @@ public class app extends javax.swing.JFrame {
      */
     public app() {
         initComponents();
+        try {
+            showData();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -90,11 +96,10 @@ public class app extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new app().setVisible(true);
-
-
             }
         });
     }
@@ -240,6 +245,11 @@ public class app extends javax.swing.JFrame {
                         "No", "Barang", "Harga", "Jumlah"
                 }
         ));
+        tabelProduk.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelProdukMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tabelProduk);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -635,8 +645,24 @@ public class app extends javax.swing.JFrame {
             model.addRow(data);
             model.fireTableDataChanged();
         }
-
-
     }
+    private void tabelProdukMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+        SimpanBTN.setEnabled(true);
+        DefaultTableModel modelproduk = (DefaultTableModel) tabelProduk.getModel();
+        int rowSelected = tabelProduk.getSelectedRow();
+        Integer valueHarga = Integer.valueOf(modelproduk.getValueAt(rowSelected, 2).toString());
+        Integer valueJumlah = Integer.valueOf(modelproduk.getValueAt(rowSelected, 3).toString());
+
+        try {
+            int total = valueHarga*Integer.valueOf(JumlahTF.getText());
+            TotalTF.setText(String.valueOf(total));
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(this, "Input Tidak Valid!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     // End of variables declaration//GEN-END:variables
 }
+
+
