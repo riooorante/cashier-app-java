@@ -4,7 +4,9 @@
  */
 
 
+import Controllers.Key;
 import Model.DataBarang;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
@@ -55,6 +57,7 @@ public class app extends javax.swing.JFrame {
     private javax.swing.JTextField jumlahbarangTF;
     private javax.swing.JTextField namaTF;
     private javax.swing.JTable tabelProduk;
+
     /**
      * Creates new form app
      */
@@ -62,9 +65,10 @@ public class app extends javax.swing.JFrame {
         initComponents();
         try {
             showData();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        HitungBTN.setEnabled(false);
     }
 
     /**
@@ -110,16 +114,16 @@ public class app extends javax.swing.JFrame {
 
         if (rowSelected >= 0 && !jumlahbarangTF.getText().isBlank()) {
             String nama = tabelProduk.getValueAt(rowSelected, 1).toString();
-            int harga = Integer.valueOf(tabelProduk.getValueAt(rowSelected,2).toString());
-            int stok  = Integer.valueOf(tabelProduk.getValueAt(rowSelected,3).toString());
+            int harga = Integer.valueOf(tabelProduk.getValueAt(rowSelected, 2).toString());
+            int stok = Integer.valueOf(tabelProduk.getValueAt(rowSelected, 3).toString());
             int jumlahBarang = Integer.valueOf(jumlahbarangTF.getText());
             int total = Integer.valueOf(jumlahbarangTF.getText()) * harga;
             TotalTF.setText(String.valueOf(total));
             int confirm = JOptionPane.showConfirmDialog(this, String.format("Anda membeli %s dengan total %d", nama, total), "Konfirmasi", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                if (stok == jumlahBarang){
+                if (stok == jumlahBarang) {
                     try {
-                        addTabelBelanja(nama,total);
+                        addTabelBelanja(nama, total);
                         deleteData(nama);
                         modelproduk.removeRow(rowSelected);
                         showData();
@@ -132,8 +136,8 @@ public class app extends javax.swing.JFrame {
                 } else if (0 < jumlahBarang && stok > jumlahBarang) {
                     try {
                         int newJumlah = stok - jumlahBarang;
-                        updateData(nama,newJumlah);
-                        addTabelBelanja(nama,total);
+                        updateData(nama, newJumlah);
+                        addTabelBelanja(nama, total);
                         showData();
                         TotalTF.setText("");
                         jumlahbarangTF.setText("");
@@ -149,21 +153,27 @@ public class app extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Pilih Barang Dan Isi Jumlahnya!", "Peringatan", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_SimpanBTNActionPerformed
-    private void addTabelBelanja(String nama, int total){
-        DefaultTableModel modelbelanja =  (DefaultTableModel) tabelBelanja.getModel();
-        modelbelanja.addRow(new Object[]{nama,total});
+
+    private void addTabelBelanja(String nama, int total) {
+        DefaultTableModel modelbelanja = (DefaultTableModel) tabelBelanja.getModel();
+        modelbelanja.addRow(new Object[]{nama, total});
     }
-    private Integer hitungtotalbelanja(){
-        DefaultTableModel modelbelanja =  (DefaultTableModel) tabelBelanja.getModel();
+
+    private Integer hitungtotalbelanja() {
+        DefaultTableModel modelbelanja = (DefaultTableModel) tabelBelanja.getModel();
         Vector<Vector> data = modelbelanja.getDataVector();
         int increment = 0;
         int total = 0;
         for (Vector<Object> row : data) {
             total += Integer.valueOf(tabelBelanja.getValueAt(increment, 1).toString().trim());
+            System.out.println(Integer.valueOf(tabelBelanja.getValueAt(increment, 1).toString().trim()));
+            increment++;
         }
-        System.out.println(total);
+        HitungBTN.setEnabled(true);
         return total;
+
     }
+
     private void HargaTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HargaTFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_HargaTFActionPerformed
@@ -182,12 +192,30 @@ public class app extends javax.swing.JFrame {
 
     private void HitungBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HitungBTNActionPerformed
         // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) tabelBelanja.getModel();
+        if (!TunaiTF.getText().isBlank()){
+            int tunai = Integer.valueOf(TunaiTF.getText());
+            if (tunai >= hitungtotalbelanja()){
+                int kembalian = tunai-hitungtotalbelanja();
+                KembaliTF.setText(String.valueOf(kembalian));
+                JOptionPane.showMessageDialog(this, String.format("Kembalian anda sebanyak Rp %s%nTerima Kasih", kembalian), "Peringatan", JOptionPane.WARNING_MESSAGE);
+                TunaiTF.setText("");
+                KembaliTF.setText("");
+                model.setRowCount(0);
+                labelTotal.setText(String.format("Total : Rp "));
+            } else {
+                JOptionPane.showMessageDialog(this, "Uang Anda Tidak Cukup", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Isi Kolom Tunai!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_HitungBTNActionPerformed
 
     private void clearBarang() {
         namaTF.setText("");
         HargaTF.setText("");
         JumlahTF.setText("");
+        jumlahbarangTF.setText("");
         namaTF.requestFocus();
     }
 
@@ -336,7 +364,7 @@ public class app extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Nunito Medium", 1, 14)); // NOI18N
         jLabel6.setText("Total");
 
-        SimpanBTN.setText("Simpan");
+        SimpanBTN.setText("Beli");
         SimpanBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SimpanBTNActionPerformed(evt);
@@ -427,7 +455,7 @@ public class app extends javax.swing.JFrame {
                 new Object[][]{
                 },
                 new String[]{
-                         "Nama Barang", "Total"
+                        "Nama Barang", "Total"
                 }
         ));
         jScrollPane3.setViewportView(tabelBelanja);
@@ -702,6 +730,7 @@ public class app extends javax.swing.JFrame {
             model.fireTableDataChanged();
         }
     }
+
     private void tabelProdukMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
         jumlahbarangTF.setText(String.valueOf(1));
