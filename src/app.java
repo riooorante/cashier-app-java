@@ -3,11 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 
-import Model.DataBarang;
 
+import Model.DataBarang;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
+import java.util.Vector;
 
 import static Controllers.Create.insertData;
 import static Controllers.Delete.deleteData;
@@ -64,7 +65,6 @@ public class app extends javax.swing.JFrame {
         } catch (SQLException e){
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -105,9 +105,65 @@ public class app extends javax.swing.JFrame {
     }
 
     private void SimpanBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SimpanBTNActionPerformed
+        DefaultTableModel modelproduk = (DefaultTableModel) tabelProduk.getModel();
+        int rowSelected = tabelProduk.getSelectedRow();
 
+        if (rowSelected >= 0 && !jumlahbarangTF.getText().isBlank()) {
+            String nama = tabelProduk.getValueAt(rowSelected, 1).toString();
+            int harga = Integer.valueOf(tabelProduk.getValueAt(rowSelected,2).toString());
+            int stok  = Integer.valueOf(tabelProduk.getValueAt(rowSelected,3).toString());
+            int jumlahBarang = Integer.valueOf(jumlahbarangTF.getText());
+            int total = Integer.valueOf(jumlahbarangTF.getText()) * harga;
+            TotalTF.setText(String.valueOf(total));
+            int confirm = JOptionPane.showConfirmDialog(this, String.format("Anda membeli %s dengan total %d", nama, total), "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (stok == jumlahBarang){
+                    try {
+                        addTabelBelanja(nama,total);
+                        deleteData(nama);
+                        modelproduk.removeRow(rowSelected);
+                        showData();
+                        TotalTF.setText("");
+                        jumlahbarangTF.setText("");
+                        labelTotal.setText(String.format("Total : Rp %s", hitungtotalbelanja()));
+                    } catch (SQLException sqlException) {
+                        sqlException.printStackTrace();
+                    }
+                } else if (0 < jumlahBarang && stok > jumlahBarang) {
+                    try {
+                        int newJumlah = stok - jumlahBarang;
+                        updateData(nama,newJumlah);
+                        addTabelBelanja(nama,total);
+                        showData();
+                        TotalTF.setText("");
+                        jumlahbarangTF.setText("");
+                        labelTotal.setText(String.format("Total : Rp %s", hitungtotalbelanja()));
+                    } catch (SQLException sqlException) {
+                        sqlException.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Stok Tidak Cukup!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih Barang Dan Isi Jumlahnya!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_SimpanBTNActionPerformed
-
+    private void addTabelBelanja(String nama, int total){
+        DefaultTableModel modelbelanja =  (DefaultTableModel) tabelBelanja.getModel();
+        modelbelanja.addRow(new Object[]{nama,total});
+    }
+    private Integer hitungtotalbelanja(){
+        DefaultTableModel modelbelanja =  (DefaultTableModel) tabelBelanja.getModel();
+        Vector<Vector> data = modelbelanja.getDataVector();
+        int increment = 0;
+        int total = 0;
+        for (Vector<Object> row : data) {
+            total += Integer.valueOf(tabelBelanja.getValueAt(increment, 1).toString().trim());
+        }
+        System.out.println(total);
+        return total;
+    }
     private void HargaTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HargaTFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_HargaTFActionPerformed
@@ -371,7 +427,7 @@ public class app extends javax.swing.JFrame {
                 new Object[][]{
                 },
                 new String[]{
-                        "No", "Nama", "Harga", "Jumlah"
+                         "Nama Barang", "Total"
                 }
         ));
         jScrollPane3.setViewportView(tabelBelanja);
@@ -648,20 +704,8 @@ public class app extends javax.swing.JFrame {
     }
     private void tabelProdukMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
-        SimpanBTN.setEnabled(true);
-        DefaultTableModel modelproduk = (DefaultTableModel) tabelProduk.getModel();
-        int rowSelected = tabelProduk.getSelectedRow();
-        Integer valueHarga = Integer.valueOf(modelproduk.getValueAt(rowSelected, 2).toString());
-        Integer valueJumlah = Integer.valueOf(modelproduk.getValueAt(rowSelected, 3).toString());
-
-        try {
-            int total = valueHarga*Integer.valueOf(JumlahTF.getText());
-            TotalTF.setText(String.valueOf(total));
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(this, "Input Tidak Valid!", "Peringatan", JOptionPane.WARNING_MESSAGE);
-        }
+        jumlahbarangTF.setText(String.valueOf(1));
     }
-
     // End of variables declaration//GEN-END:variables
 }
 
