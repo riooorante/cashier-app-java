@@ -22,10 +22,8 @@ public class Update {
         try {
             Statement statement = connect.createStatement();
             statement.executeUpdate(String.format("UPDATE `tabel_produk` SET `jumlah_produk` = %d WHERE `nama_produk` = '%s'", dataBarang.getJumlahProduk(), dataBarang.getNamaProduk()));
-            System.out.println("Data berhasil di Update");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Data Tidak Ditemukan");
         }
         connect.close();
     }
@@ -36,10 +34,8 @@ public class Update {
         try {
             Statement statement = connect.createStatement();
             statement.executeUpdate(String.format("UPDATE `tabel_produk` SET `jumlah_produk` = %d, `harga_produk` = %d WHERE `nama_produk` = '%s'", dataBarang.getJumlahProduk(), dataBarang.getHargaProduk(), dataBarang.getNamaProduk()));
-            System.out.println("Data berhasil di Update");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Data Tidak Ditemukan");
         }
         connect.close();
     }

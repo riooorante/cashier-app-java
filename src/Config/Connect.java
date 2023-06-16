@@ -21,7 +21,6 @@ public class Connect {
             return connect;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Connection: Gagal");
             return null;
         }
     }

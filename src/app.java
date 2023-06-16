@@ -67,7 +67,6 @@ public class app extends javax.swing.JFrame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        HitungBTN.setEnabled(false);
     }
 
     /**
@@ -132,7 +131,7 @@ public class app extends javax.swing.JFrame {
                     } catch (SQLException sqlException) {
                         sqlException.printStackTrace();
                     }
-                } else if (0 < jumlahBarang && stok > jumlahBarang) {
+                } else if (0 < jumlahBarang && jumlahBarang < stok) {
                     try {
                         int newJumlah = stok - jumlahBarang;
                         updateData(nama, newJumlah);
@@ -165,10 +164,8 @@ public class app extends javax.swing.JFrame {
         int total = 0;
         for (Vector<Object> row : data) {
             total += Integer.valueOf(tabelBelanja.getValueAt(increment, 1).toString().trim());
-            System.out.println(Integer.valueOf(tabelBelanja.getValueAt(increment, 1).toString().trim()));
             increment++;
         }
-        HitungBTN.setEnabled(true);
         return total;
 
     }
@@ -192,10 +189,10 @@ public class app extends javax.swing.JFrame {
     private void HitungBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HitungBTNActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel) tabelBelanja.getModel();
-        if (!TunaiTF.getText().isBlank()){
+        if (!TunaiTF.getText().isBlank() && hitungtotalbelanja() != 0) {
             int tunai = Integer.valueOf(TunaiTF.getText());
-            if (tunai >= hitungtotalbelanja()){
-                int kembalian = tunai-hitungtotalbelanja();
+            if (tunai >= hitungtotalbelanja()) {
+                int kembalian = tunai - hitungtotalbelanja();
                 KembaliTF.setText(String.valueOf(kembalian));
                 JOptionPane.showMessageDialog(this, String.format("Kembalian anda sebanyak Rp %s%nTerima Kasih", kembalian), "Peringatan", JOptionPane.WARNING_MESSAGE);
                 TunaiTF.setText("");
@@ -205,6 +202,8 @@ public class app extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "Uang Anda Tidak Cukup", "Peringatan", JOptionPane.WARNING_MESSAGE);
             }
+        } else if (hitungtotalbelanja() == 0) {
+            JOptionPane.showMessageDialog(this, "Keranjang Masih Kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Isi Kolom Tunai!", "Peringatan", JOptionPane.WARNING_MESSAGE);
         }
@@ -675,7 +674,7 @@ public class app extends javax.swing.JFrame {
         int rowSelected = tabelProduk.getSelectedRow();
 
         if (rowSelected >= 0) {
-            int confirm = JOptionPane.showConfirmDialog(this, "Anda yakin ingin menghapus baris ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "Anda Yakin Menghapus Produk Ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     String nama = tabelProduk.getValueAt(rowSelected, 1).toString();

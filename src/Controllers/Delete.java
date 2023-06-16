@@ -25,9 +25,7 @@ public class Delete {
             statement.setString(1, dataBarang.getNamaProduk());
             int rowsDeleted = statement.executeUpdate();
             if (rowsDeleted > 0) {
-                System.out.println("Data berhasil dihapus.");
             } else {
-                System.out.println("Data tidak ditemukan.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

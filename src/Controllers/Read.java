@@ -34,10 +34,7 @@ public class Read {
                     DataBarang dataBarang = new DataBarang(nama, hargaProduk, jumlahProduk);
                     arrayList.add(dataBarang);
                 }
-            } else {
-                System.out.println("Tidak Ada Data!");
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
