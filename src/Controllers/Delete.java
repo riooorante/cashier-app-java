@@ -24,9 +24,6 @@ public class Delete {
             PreparedStatement statement = conn.prepareStatement(querydel);
             statement.setString(1, dataBarang.getNamaProduk());
             int rowsDeleted = statement.executeUpdate();
-            if (rowsDeleted > 0) {
-            } else {
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
