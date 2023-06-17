@@ -2,6 +2,8 @@
 # Simple Cashier App
 Aplikasi kasir ini merupakan sistem sederhana yang terintegrasi dengan database. Didesain untuk membantu petugas dalam menghitung total belanja pelanggan dan memberikan informasi tentang pembayaran, termasuk total tagihan, jumlah tunai, dan kembalian. Dengan antarmuka intuitif, aplikasi ini mempermudah pencatatan produk, proses penjualan, dan pembayaran. Keunggulan aplikasi ini adalah meningkatkan efisiensi kasir, mengelola stok produk, dan memberikan informasi akurat kepada pelanggan.
 
+![Video Name](https://youtu.be/oVXF4JxQjHY)
+
 # Struktur Folder 
 - Config: Konektor aplikasi dengan database
 	- Connect.java  
